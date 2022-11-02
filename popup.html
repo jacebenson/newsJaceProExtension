@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>activity</title>
+    <style>
+        html {
+            height: 400px;
+            width: 400px;
+        }
+        textarea {
+  width: 100%;
+}
+    </style>
+</head>
+
+<body>
+    <p access="false">This extension adds Items to news.jace.pro</p>
+    <details>
+        <summary>Set your key here</summary>
+        <label for="select-key">key to enter</label>
+        <input name="select-key" id="select-key" type="password" />
+        <button type="button" name="button-update" id="button-update">Save</button>
+    </details>
+<hr />
+    <label for="select-title">Title</label>
+    <textarea rows="3" name="select-title" id="select-title"></textarea>
+    <br />
+    <label for="select-url">Url</label>
+    <textarea rows="5" name="select-url" id="select-url"></textarea>
+    <br />
+    <button type="button" name="button-submit" id="button-getter">Get URL and Title</button>
+    <button type="button" name="button-submit" id="button-submit">Submit News</button>
+    <pre id="response"></pre>
+    <script src="popup.js"></script>
+</body>
+
+</html>
