@@ -26,9 +26,20 @@ let getDetails = () => {
   console.log('currentTab', currentTab)
     let titleInput = document.querySelector('#select-title').value
     let urlInput = document.querySelector('#select-url').value
-    console.log('trying to set title to', currentTab.title)
+    console.log({currentTab, titleInput, urlInput})
     document.querySelector('#select-title').value = currentTab.title;
     document.querySelector('#select-url').value = currentTab.url;
+    // get the seo details
+    fetch(currentTab.url)
+      .then(response => response.text())
+      .then(html => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const meta = doc.querySelector('meta[name="description"]');
+        const description = meta ? meta.getAttribute('content') : '';
+        console.log({doc, meta, description});
+       // document.querySelector('#select-description').value = description;
+      }
+      )
 }
 let submitItem = () => {
     if (newsJaceProKey) {
