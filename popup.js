@@ -1,7 +1,8 @@
 let updateKey = () => {
   // set the chrome sync storage time to the 'select-time' value when 'button-update' is clicked
   let newsJaceProKey = document.querySelector('#select-key').value;
-  chrome.storage.sync.set({ newsJaceProKey }, () => {
+  let domain = document.querySelector('#select-domain').value || 'https://news.jace.pro';
+  chrome.storage.sync.set({ newsJaceProKey, domain }, () => {
     console.log('newsJaceProKey is set to ' + newsJaceProKey);
     document.querySelector('#button-update').disabled = true;
     document.querySelector('#button-update').innerText = 'Key is set';
@@ -11,10 +12,29 @@ let updateKey = () => {
     }, 1000);
   });
 }
+let setDomainOnLoad = () => {
+  chrome.storage.sync.get(['domain'], function (data) {
+    if (data.domain) {
+      document.querySelector('#select-domain').value = data.domain;
+    }
+  });
+}
+setDomainOnLoad();
+setKeyOnLoad = () => {
+  chrome.storage.sync.get(['newsJaceProKey'], function (data) {
+    if (data.newsJaceProKey) {
+      document.querySelector('#select-key').value = data.newsJaceProKey;
+    }
+  });
+}
+setKeyOnLoad();
 let newsJaceProKey = false;
-chrome.storage.sync.get(['newsJaceProKey'], function (data) {
+chrome.storage.sync.get(['newsJaceProKey', 'domain'], function (data) {
   if (data.newsJaceProKey) {
     newsJaceProKey = data.newsJaceProKey;
+  }
+  if (data.domain) {
+    domain = data.domain;
   }
 });
 let currentTab = false;
@@ -42,21 +62,32 @@ let getDetails = () => {
       )
 }
 let submitItem = () => {
+  console.log({function: 'submitItem', newsJaceProKey, currentTab, domain})
+    if (!newsJaceProKey) {
+      document.querySelector('#response').innerText = 'Please set a key first';
+      return;
+    }
+    if (!domain) {
+      document.querySelector('#response').innerText = 'Please set a domain first';
+      return;
+    }
     if (newsJaceProKey) {
       var data = {
         "method": "POST",
         "headers": {
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "*",
           "submitKey": newsJaceProKey,
         },
-        "body": JSON.stringify({
+        "body": JSON.stringify([{
           "title": document.querySelector('#select-title').value || currentTab.title,
           "url": document.querySelector('#select-url').value || currentTab.url
-        })
+        }])
       }
       document.querySelector('#response').innerText = 'Sending data...' + '\n' + JSON.stringify(JSON.parse(data.body), null, ' ');
       console.log('snding data', JSON.parse(data.body))
-      fetch("https://news.jace.pro/.redwood/functions/submitItem", data)
+      fetch(`${domain}/.redwood/functions/submitItem`, data)
         .then(response => {
           console.log('response', response);
           document.querySelector('#response').innerText = 'response: \n' + JSON.stringify(response, null, ' ');
